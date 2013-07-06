@@ -226,6 +226,33 @@ module Geoloader
   end
 end
 
+module Geoloader
+  class Geoserver
+
+    def initialize ( options = {} )
+      @service_root = options[:service_root] || Geoloader::Config.server.service_root
+      @service_user = options[:service_user] || Geoloader::Config.server.service_user
+      @service_password = options[:service_password] || Geoloader::Config.server.service_password
+    end
+
+    def coverage!(workspace, coverage)
+      command = "curl -u #{@service_user}:#{@service_password} -v -XPOST -H \"Content-Type: application/xml\""
+      command += " -d '<coverageStore><name>#{coverage}</name><workspace>#{workspace}</workspace>"
+      command += "<enabled>true</enabled></coverageStore>'"
+      command += " #{@service_root}/workspaces/#{workspace}/coveragestores"
+      system(command)
+    end
+
+    def add_raster(workspace,  file)
+      base = File.basename(file, '.tif')
+      command = "curl -u #{@service_user}:#{@service_password} -v -XPUT -H \"Content-type: image/tiff\""
+      command += " --data-binary @#{file}"
+      command +=  " #{@service_root}/workspaces/#{workspace}/coveragestores/#{base}/file.geotiff"
+    end
+
+  end
+end
+
 #Dir["*.tif"].each do |file|
 #pp file
 ##GdalFile.new(file, 'r')
@@ -234,14 +261,19 @@ end
 $DEBUG = true
 
 base = "1937_16_44.tif"
-geotif = Geoloader::GdalWrapper.new("#{base}")
-metadata = "#{base}.xml"
-geonetwork_xml = "#{base}_geonetwork.xml"
+#geotif = Geoloader::GdalWrapper.new("#{base}")
+#metadata = "#{base}.xml"
+#geonetwork_xml = "#{base}_geonetwork.xml"
 
 #puts geotif.get_extents
+#
 
 
-#new = Geoloader::Transform.from_arcgis(metadata, geonetwork_xml)
 
-gn = Geoloader::Geonetwork.new({:service_root => 'http://localhost:8080/geonetwork'})
-ap gn.metrics
+#ap loader.coverage!('Albemarle', 'AlbemarleAerials')
+#ap loader.add_raster('AlbemarleAerials',  base)
+##ap loader.add_raster('Albemarle', 'AlbemarleAerials', base)
+
+#e = "curl -u slabadmin:GIS4slab! -v -XPUT -H \"Content-type: image/tiff\" --data-binary @1937_16_44.tif http://libsvr35.lib.virginia.edu:8080/geoserver/rest/workspaces/AlbemarleAerials/coveragestores/1937_16_44/file.geotiff"
+
+#ap e
