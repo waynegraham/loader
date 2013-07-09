@@ -235,7 +235,18 @@ module Geoloader
       @service_password = options[:service_password] || Geoloader::Config.server.service_password
     end
 
+    def workspace!(workspace)
+      @workspace = workspace
+    end
+
+    def coverage!(coverage)
+      @coverage = coverage
+    end
+
     def coverage!(workspace, coverage)
+      @workspace = workspace
+      @coverage = coverage
+
       command = "curl -u #{@service_user}:#{@service_password} -v -XPOST -H \"Content-Type: application/xml\""
       command += " -d '<coverageStore><name>#{coverage}</name><workspace>#{workspace}</workspace>"
       command += "<enabled>true</enabled></coverageStore>'"
@@ -243,37 +254,20 @@ module Geoloader
       system(command)
     end
 
-    def add_raster(workspace,  file)
+    def add_raster(file)
       base = File.basename(file, '.tif')
       command = "curl -u #{@service_user}:#{@service_password} -v -XPUT -H \"Content-type: image/tiff\""
       command += " --data-binary @#{file}"
-      command +=  " #{@service_root}/workspaces/#{workspace}/coveragestores/#{base}/file.geotiff"
+      command +=  " #{@service_root}/workspaces/#{@workspace}/coveragestores/#{base}/file.geotiff"
+      system command
     end
 
   end
 end
 
-#Dir["*.tif"].each do |file|
-#pp file
-##GdalFile.new(file, 'r')
-#end
+
 
 $DEBUG = true
 
 base = "1937_16_44.tif"
-#geotif = Geoloader::GdalWrapper.new("#{base}")
-#metadata = "#{base}.xml"
-#geonetwork_xml = "#{base}_geonetwork.xml"
 
-#puts geotif.get_extents
-#
-
-
-
-#ap loader.coverage!('Albemarle', 'AlbemarleAerials')
-#ap loader.add_raster('AlbemarleAerials',  base)
-##ap loader.add_raster('Albemarle', 'AlbemarleAerials', base)
-
-#e = "curl -u slabadmin:GIS4slab! -v -XPUT -H \"Content-type: image/tiff\" --data-binary @1937_16_44.tif http://libsvr35.lib.virginia.edu:8080/geoserver/rest/workspaces/AlbemarleAerials/coveragestores/1937_16_44/file.geotiff"
-
-#ap e
