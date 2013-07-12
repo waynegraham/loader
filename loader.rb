@@ -19,7 +19,7 @@ module Geoloader
     end
 
     #returns basic size info as a hash
-    def size()
+    def size
       {
         "x" => @gdalfile.RasterXSize,
         "y" => @gdalfile.RasterYSize,
@@ -29,12 +29,12 @@ module Geoloader
     end
 
     #x dimention size
-    def xsize()
+    def xsize
       @gdalfile.RasterXSize
     end
 
     #y dim size
-    def ysize()
+    def ysize
       @gdalfile.RasterYSize
     end
 
@@ -48,7 +48,7 @@ module Geoloader
     # [Origin (top left corner), X pixel size, Rotation (0 if north is up),Y
     # Origin (top left corner), Rotation (0 if north is up), Y pixel size *-1 
     # (its negitive)]
-    def get_geo_transform()
+    def get_geo_transform
       @gdalfile.get_geo_transform
     end
 
@@ -235,6 +235,10 @@ module Geoloader
       @service_password = options[:service_password] || Geoloader::Config.server.service_password
     end
 
+    def workspace
+      @workspace
+    end
+
     def workspace!(workspace)
       @workspace = workspace
     end
@@ -243,14 +247,14 @@ module Geoloader
       @coverage = coverage
     end
 
-    def coverage!(workspace, coverage)
+    def coverage!(coverage)
       @workspace = workspace
       @coverage = coverage
 
       command = "curl -u #{@service_user}:#{@service_password} -v -XPOST -H \"Content-Type: application/xml\""
-      command += " -d '<coverageStore><name>#{coverage}</name><workspace>#{workspace}</workspace>"
+      command += " -d '<coverageStore><name>#{coverage}</name><workspace>#{@workspace}</workspace>"
       command += "<enabled>true</enabled></coverageStore>'"
-      command += " #{@service_root}/workspaces/#{workspace}/coveragestores"
+      command += " #{@service_root}/workspaces/#{@workspace}/coveragestores"
       system(command)
     end
 
@@ -262,12 +266,12 @@ module Geoloader
       system command
     end
 
+
   end
 end
 
 
+  $DEBUG = true
 
-$DEBUG = true
-
-base = "1937_16_44.tif"
+  base = "1937_16_44.tif"
 
