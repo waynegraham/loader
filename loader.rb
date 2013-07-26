@@ -14,6 +14,8 @@ require 'curb'
 
 require 'rgeoserver'
 
+require 'rspec'
+
 module Geoloader
   class Geotiff
 
@@ -341,8 +343,12 @@ ap translated
 final_file = gdal.rename(translated)
 
 ap loader.add_raster(final_file)
+ap gdal.cleanup
 
-
-#ap gdal.cleanup
-
-
+#describe Geoloader::Geotiff do
+  #it "should shell for gdalwarp" do
+    #gdal = Geoloader::Geotiff.new
+    #gdal.should_receive("system").with("gdalwarp")
+    #gdal.remove_border(file)
+  #end
+#end
