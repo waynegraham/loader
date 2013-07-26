@@ -10,6 +10,49 @@ require "nokogiri"
 require 'rest_client'
 require 'awesome_print'
 
+require 'curb'
+
+require 'rgeoserver'
+
+module Geoloader
+  class Geotiff
+
+    def initialize(work_dir = '/tmp')
+      @work_dir = work_dir
+    end
+
+    def remove_border(tif_path)
+      command = "gdalwarp -srcnodata 0 -dstalpha "
+      execute(tif_path, '_warped', command)
+    end
+
+    def add_header(tif_path)
+      command = "gdal_translate -of GTiff -a_srs EPSG:4326 "
+      execute(tif_path, '_translated', command)
+    end
+
+    def rename(tif_path)
+      new_name = tif_path.gsub(/_warped_translated/,'')
+      FileUtils.mv tif_path, "#{new_name}"
+      new_name
+    end
+
+    def cleanup
+      FileUtils.rm Dir.glob("#{@work_dir}/*.tif")
+    end
+
+    private
+
+    def execute(tif_file, suffix, command)
+      new_file = File.basename(tif_file, '.tif') + "#{suffix}.tif"
+      command += "#{tif_file} #{@work_dir}/#{new_file}"
+      system command
+      "#{@work_dir}/#{new_file}"
+    end
+
+  end
+end
+
 
 module Geoloader
   class GdalWrapper
@@ -157,7 +200,7 @@ module Geoloader
       when :csw then
         export_csw(uuid, dir)
       else
-        raise ArgumentError, "Unsupported export format #{format}"        
+        raise ArgumentError, "Unsupported export format #{format}"
       end
     end
 
@@ -259,19 +302,47 @@ module Geoloader
     end
 
     def add_raster(file)
+
       base = File.basename(file, '.tif')
-      command = "curl -u #{@service_user}:#{@service_password} -v -XPUT -H \"Content-type: image/tiff\""
+      url =  "#{@service_root}/workspaces/#{@workspace}/coveragestores/#{base}/file.geotiff"
+
+      command = ""
+      command += "curl -u #{@service_user}:#{@service_password} -v -XPUT -H \"Content-type: image/tiff\""
       command += " --data-binary @#{file}"
-      command +=  " #{@service_root}/workspaces/#{@workspace}/coveragestores/#{base}/file.geotiff"
+      command += " #{url}"
       system command
     end
-
 
   end
 end
 
 
-  $DEBUG = true
+$DEBUG = true
 
-  base = "1937_16_44.tif"
+geoserver_options = {
+  :service_root => 'http://localhost:8080/geoserver/rest',
+  :service_user => 'admin',
+  :service_password => 'geoserver'
+}
+
+file = "1937_16_44.tif"
+
+loader = Geoloader::Geoserver.new(geoserver_options)
+loader.workspace!('foo')
+
+gdal = Geoloader::Geotiff.new
+
+warped = gdal.remove_border(file)
+ap warped
+
+translated = gdal.add_header(warped)
+ap translated
+
+final_file = gdal.rename(translated)
+
+ap loader.add_raster(final_file)
+
+
+#ap gdal.cleanup
+
 
