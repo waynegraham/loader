@@ -3,7 +3,7 @@ require "gdal-ruby/gdalconst"
 require "gdal-ruby/osr"
 
 module Geoloader
-  class GdalWrapper
+  class Gdal
 
     def initialize(file)
       @gdalfile = Gdal::Gdal.open(file)
@@ -25,7 +25,7 @@ module Geoloader
     end
 
     #y dim size
-    def ysize()
+    def ysize
       @gdalfile.RasterYSize
     end
 
@@ -59,6 +59,9 @@ module Geoloader
       }
     end
 
+    def file_modified
+
+    end
+
   end
 end
-
