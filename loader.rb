@@ -1,22 +1,19 @@
 #! /usr/bin/env ruby
 
-require 'pp'
-require "gdal-ruby/gdal"
-require "gdal-ruby/gdalconst"
-require "gdal-ruby/osr"
+#require 'pp'
+#require "gdal-ruby/gdal"
+#require "gdal-ruby/gdalconst"
+#require "gdal-ruby/osr"
 
-require "nokogiri"
+#require "nokogiri"
 
-require 'rest_client'
+#require 'rest_client'
 require 'awesome_print'
 
-require 'curb'
+#require 'curb'
 
-require 'rgeoserver'
-
-require 'rspec'
-
-
+#require 'rgeoserver'
+require 'lib/geoloader.rb'
 
 
 

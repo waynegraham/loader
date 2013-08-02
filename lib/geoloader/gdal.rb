@@ -5,6 +5,8 @@ require "gdal-ruby/osr"
 module Geoloader
   class Gdal
 
+    attr_accessor :gdal_file
+
     def initialize(file)
       @gdalfile = Gdal::Gdal.open(file)
     end
