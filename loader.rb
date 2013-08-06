@@ -13,7 +13,7 @@ require 'awesome_print'
 #require 'curb'
 
 #require 'rgeoserver'
-require 'lib/geoloader.rb'
+require 'geoloader'
 
 
 

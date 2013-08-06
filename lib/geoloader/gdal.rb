@@ -8,7 +8,7 @@ module Geoloader
     attr_accessor :gdal_file
 
     def initialize(file)
-      @gdalfile = Gdal::Gdal.open(file)
+      #@gdalfile = Gdal::Gdal.open(file)
     end
 
     #returns basic size info as a hash
